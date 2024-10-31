@@ -1,0 +1,16 @@
+{
+    "name": "integration-helper/base-image",
+    "description": "Integration Helper. Base Image",
+    "license": "MIT",
+    "require": {
+        "php": "^8.2",
+        "integration-helper/base-logger": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "IntegrationHelper\\BaseImage\\": ""
+        }
+    },
+    "minimum-stability": "dev",
+    "version": "1.0.0"
+}

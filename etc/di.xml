@@ -1,0 +1,164 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="IntegrationHelper\BaseImage\Api\ImageProcessorArgInterface"
+                type="IntegrationHelper\BaseImage\Model\ImageProcessors\ImageProcessorArg"/>
+    <preference for="IntegrationHelper\BaseImage\Api\ImageProcessorResultInterface"
+                type="IntegrationHelper\BaseImage\Model\ImageProcessors\ImageProcessorResult"/>
+    <preference for="IntegrationHelper\BaseImage\Api\ImageProcessorManagerInterface"
+                type="IntegrationHelper\BaseImage\Model\ImageProcessorManager"/>
+
+    <type name="IntegrationHelper\BaseLogger\Logger\LoggerInitiator">
+        <arguments>
+            <argument name="loggerTypes" xsi:type="array">
+                <item name="resizer_product_image_crit" xsi:type="array">
+                    <item name="log_type" xsi:type="string">resizer_product_image_crit</item>
+                    <item name="filepath" xsi:type="string">/var/log/resizer_product_image_crit.log</item>
+                </item>
+                <item name="cleaner_product_image_crit" xsi:type="array">
+                    <item name="log_type" xsi:type="string">cleaner_product_image_crit</item>
+                    <item name="filepath" xsi:type="string">/var/log/cleaner_product_image_crit.log</item>
+                </item>
+                <item name="saver_product_image_crit" xsi:type="array">
+                    <item name="log_type" xsi:type="string">saver_product_image_crit</item>
+                    <item name="filepath" xsi:type="string">/var/log/saver_product_image_crit.log</item>
+                </item>
+                <item name="uploader_product_image_crit" xsi:type="array">
+                    <item name="log_type" xsi:type="string">uploader_product_image_crit</item>
+                    <item name="filepath" xsi:type="string">/var/log/uploader_product_image_crit.log</item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+
+    <virtualType name="IntegrationHelper\BaseImage\Model\ProductImageUploaderConfig"
+                 type="IntegrationHelper\BaseImage\Model\ImageConfig">
+        <arguments>
+            <argument name="imageDestinationPath" xsi:type="string">catalog/product</argument>
+            <argument name="uniqueTypeId" xsi:type="string">product_image_upload</argument>
+            <argument name="constraintOnly" xsi:type="boolean">true</argument>
+            <argument name="keepTransparency" xsi:type="boolean">true</argument>
+            <argument name="keepFrame" xsi:type="boolean">true</argument>
+            <argument name="keepAspectRatio" xsi:type="boolean">true</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Magento\Framework\Console\CommandListInterface">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="integration-helper-image-clear" xsi:type="object">IntegrationHelper\BaseImage\Console\Command\Clear</item>
+                <item name="integration-helper-image-optimize" xsi:type="object">IntegrationHelper\BaseImage\Console\Command\Optimize</item>
+                <item name="integration-helper-image-resize" xsi:type="object">IntegrationHelper\BaseImage\Console\Command\Resize</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="IntegrationHelper\BaseImage\Console\Command\Clear">
+        <arguments>
+            <argument name="imageProcessorManager" xsi:type="object">IntegrationHelper\BaseImage\Model\ImageProcessorManager\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="IntegrationHelper\BaseImage\Console\Command\Optimize">
+        <arguments>
+            <argument name="imageProcessorManager" xsi:type="object">IntegrationHelper\BaseImage\Model\ImageProcessorManager\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="IntegrationHelper\BaseImage\Console\Command\Resize">
+        <arguments>
+            <argument name="imageProcessorManager" xsi:type="object">IntegrationHelper\BaseImage\Model\ImageProcessorManager\Proxy</argument>
+        </arguments>
+    </type>
+
+    <type name="IntegrationHelper\BaseImage\Model\ImageProcessors\ImageResizer\ImageResizer">
+         <arguments>
+             <argument name="skipImageTypes" xsi:type="array">
+                 <item name="svg" xsi:type="string">svg</item>
+             </argument>
+         </arguments>
+    </type>
+
+    <type name="IntegrationHelper\BaseImage\Model\ImageProcessors\ImageSaver\ImageSaver">
+        <arguments>
+            <argument name="skipImageTypes" xsi:type="array">
+                <item name="svg" xsi:type="string">svg</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="IntegrationHelper\BaseImage\Model\ImageProcessors\ImageProcessorOptimizer">
+         <arguments>
+             <argument name="imageProcessorResult" xsi:type="object">IntegrationHelper\BaseImage\Model\ImageProcessors\ImageProcessorResult</argument>
+             <argument name="imageProcessPool" xsi:type="object">IntegrationHelper\BaseImage\Model\ImageProcessors\ImageOptimizerPool</argument>
+             <argument name="processName" xsi:type="const">IntegrationHelper\BaseImage\Api\ConstraintsInterface::PROCESS_OPTIMIZER</argument>
+             <argument name="sortOrder" xsi:type="string">15</argument>
+         </arguments>
+    </type>
+    <type name="IntegrationHelper\BaseImage\Model\ImageProcessors\ImageProcessorCleaner">
+         <arguments>
+             <argument name="imageProcessorResult" xsi:type="object">IntegrationHelper\BaseImage\Model\ImageProcessors\ImageProcessorResult</argument>
+             <argument name="imageProcessPool" xsi:type="object">IntegrationHelper\BaseImage\Model\ImageProcessors\ImageCleanerPool</argument>
+             <argument name="processName" xsi:type="const">IntegrationHelper\BaseImage\Api\ConstraintsInterface::PROCESS_CLEANER</argument>
+             <argument name="sortOrder" xsi:type="string">100</argument>
+         </arguments>
+    </type>
+    <type name="IntegrationHelper\BaseImage\Model\ImageProcessorPool">
+         <arguments>
+             <argument name="processors" xsi:type="array">
+                 <item name="resizer" xsi:type="object">IntegrationHelper\BaseImage\Model\ImageProcessors\ImageProcessorResizer</item>
+                 <item name="optimizer" xsi:type="object">IntegrationHelper\BaseImage\Model\ImageProcessors\ImageProcessorOptimizer</item>
+                 <item name="cleaner" xsi:type="object">IntegrationHelper\BaseImage\Model\ImageProcessors\ImageProcessorCleaner</item>
+                 <item name="saver" xsi:type="object">IntegrationHelper\BaseImage\Model\ImageProcessors\ImageProcessorSaver</item>
+                 <item name="uploader" xsi:type="object">IntegrationHelper\BaseImage\Model\ImageProcessors\ImageProcessorUploader</item>
+             </argument>
+         </arguments>
+    </type>
+
+
+    <virtualType name="IntegrationHelper\BaseImage\Model\ImageProcessors\ImageCleanerPool"
+                 type="IntegrationHelper\BaseImage\Model\ImageProcessors\ImageProcessPool"/>
+
+    <virtualType name="IntegrationHelper\BaseImage\Model\ImageProcessors\ImageOptimizerPool"
+                 type="IntegrationHelper\BaseImage\Model\ImageProcessors\ImageProcessPool">
+    </virtualType>
+
+    <virtualType name="IntegrationHelper\BaseImage\Model\ImageProcessors\ImageSaverPool"
+                 type="IntegrationHelper\BaseImage\Model\ImageProcessors\ImageProcessPool">
+    </virtualType>
+
+    <virtualType name="IntegrationHelper\BaseImage\Model\ImageProcessors\ImageUploaderPool"
+                 type="IntegrationHelper\BaseImage\Model\ImageProcessors\ImageProcessPool">
+    </virtualType>
+
+    <virtualType name="IntegrationHelper\BaseImage\Model\ImageProcessors\ImageResizerPool"
+                 type="IntegrationHelper\BaseImage\Model\ImageProcessors\ImageProcessPool">
+    </virtualType>
+
+    <virtualType name="IntegrationHelper\BaseImage\Model\ImageProcessors\ImageProcessorResizer"
+                 type="IntegrationHelper\BaseImage\Model\ImageProcessors\ImageProcessor">
+        <arguments>
+            <argument name="imageProcessorResult" xsi:type="object">IntegrationHelper\BaseImage\Model\ImageProcessors\ImageProcessorResult</argument>
+            <argument name="imageProcessPool" xsi:type="object">IntegrationHelper\BaseImage\Model\ImageProcessors\ImageResizerPool</argument>
+            <argument name="processName" xsi:type="const">IntegrationHelper\BaseImage\Api\ConstraintsInterface::PROCESS_RESIZER</argument>
+            <argument name="sortOrder" xsi:type="string">6</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="IntegrationHelper\BaseImage\Model\ImageProcessors\ImageProcessorSaver"
+                 type="IntegrationHelper\BaseImage\Model\ImageProcessors\ImageProcessor">
+        <arguments>
+            <argument name="imageProcessorResult" xsi:type="object">IntegrationHelper\BaseImage\Model\ImageProcessors\ImageProcessorResult</argument>
+            <argument name="imageProcessPool" xsi:type="object">IntegrationHelper\BaseImage\Model\ImageProcessors\ImageSaverPool</argument>
+            <argument name="processName" xsi:type="const">IntegrationHelper\BaseImage\Api\ConstraintsInterface::PROCESS_SAVER</argument>
+            <argument name="sortOrder" xsi:type="string">3</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="IntegrationHelper\BaseImage\Model\ImageProcessors\ImageProcessorUploader"
+                 type="IntegrationHelper\BaseImage\Model\ImageProcessors\ImageProcessor">
+        <arguments>
+            <argument name="imageProcessorResult" xsi:type="object">IntegrationHelper\BaseImage\Model\ImageProcessors\ImageProcessorResult</argument>
+            <argument name="imageProcessPool" xsi:type="object">IntegrationHelper\BaseImage\Model\ImageProcessors\ImageUploaderPool</argument>
+            <argument name="processName" xsi:type="const">IntegrationHelper\BaseImage\Api\ConstraintsInterface::PROCESS_UPLOADER</argument>
+            <argument name="sortOrder" xsi:type="string">5</argument>
+        </arguments>
+    </virtualType>
+</config>
