@@ -1,16 +1,27 @@
 {
     "name": "integration-helper/base-image",
     "description": "Integration Helper. Base Image",
-    "license": "MIT",
+    "type": "magento2-module",
+    "license": [
+        "OSL-3.0",
+        "AFL-3.0"
+    ],
+    "config": {
+        "sort-packages": true
+    },
+    "version": "1.0.1",
     "require": {
-        "php": "^8.2",
+        "php": "~8.1.0||~8.2.0",
+        "magento/framework": "103.0.*",
+        "magento/module-backend": "102.0.*",
         "integration-helper/base-logger": "*"
     },
     "autoload": {
+        "files": [
+            "registration.php"
+        ],
         "psr-4": {
             "IntegrationHelper\\BaseImage\\": ""
         }
-    },
-    "minimum-stability": "dev",
-    "version": "1.0.0"
+    }
 }
