@@ -90,10 +90,6 @@ class ImageResizer extends AbstractImage implements ImageResizerInterface
      */
     public function execute(string $image): ImageResizerInterface
     {
-        if($this->isSkip($image)) {
-            return $this;
-        }
-
         $typeId = $this->imageConfig->getUniqueTypeId();
 
         [$width, $height, $imagePath, $imageResizedPath] = $this->getImageData();
@@ -101,6 +97,12 @@ class ImageResizer extends AbstractImage implements ImageResizerInterface
         $imageHash = $this->getHashImage($typeId, $image);
         $resizedPath = sprintf('%s/%s/%s/', trim($imageResizedPath, DIRECTORY_SEPARATOR), $width, $height);
         $imageResized = $this->getFile($image, $resizedPath);
+
+        if($this->isSkip($image)) {
+            $this->_resizedImages[$imageHash] = $this->getImagePath($imagePath, $image);
+
+            return $this;
+        }
 
         try {
             if($this->fileDriver->isExists($imageResized) && $this->fileDriver->isFile($imageResized)) {
