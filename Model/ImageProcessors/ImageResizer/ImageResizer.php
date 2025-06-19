@@ -122,7 +122,7 @@ class ImageResizer extends AbstractImage implements ImageResizerInterface
             $this->log(sprintf('Image with type id: %s and path %s wasn\'t found', $typeId, $imagePath));
         }
 
-        $result = $this->processResize($imagePath, $imageResized, $width, $height);
+        $result = $this->processResize($imagePath, $imageResized, $width);
 
         if($result) $this->_resizedImages[$imageHash] = $this
             ->getImagePath($resizedPath, $image);
@@ -208,14 +208,20 @@ class ImageResizer extends AbstractImage implements ImageResizerInterface
      * @param string $imagePath
      * @param string $imageResizedPath
      * @param string $width
-     * @param string $height
      * @return $this|false
      */
-    protected function processResize(string $imagePath, string $imageResizedPath, string $width, string $height)
+    protected function processResize(string $imagePath, string $imageResizedPath, string $width)
     {
         try {
             $imageResize = $this->imageFactory->create();
             $imageResize->open($imagePath);
+
+            $origWidth = $imageResize->getOriginalWidth();
+            $origHeight = $imageResize->getOriginalHeight();
+
+            $scale = $width / $origWidth;
+            $height = (int) round($origHeight * $scale);
+
             $imageResize->constrainOnly($this->imageConfig->getConstraintOnly());
             $imageResize->keepTransparency($this->imageConfig->getKeepTransparency());
             $imageResize->quality($this->imageConfig->getQuality());
